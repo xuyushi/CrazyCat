@@ -7,9 +7,9 @@ public class Dot {
     public int x,y;
     public int status;
 
-    public static final int STATUS_ON = 0;
-    public static final int STATUS_OFF = 1;
-    public static final int STATUS_IN = 9;
+    public static final int STATUS_ON = 0;  //障碍物
+    public static final int STATUS_OFF = 1; //空闲路径
+    public static final int STATUS_IN = 9;  //猫在的位置
 
     public Dot(int x, int y) {
         this.x = x;

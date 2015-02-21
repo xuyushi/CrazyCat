@@ -6,13 +6,15 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 /**
  * Created by xuyushi on 15/2/21.
  */
-public class Playground extends SurfaceView {
+public class Playground extends SurfaceView implements View.OnTouchListener {
     public static int WIDTH = 100;
     public static final int ROW = 10;
     public static final int COL = 10;
@@ -33,6 +35,7 @@ public class Playground extends SurfaceView {
 
         initGame();
 
+        setOnTouchListener(this);
         surfaceHolder = getHolder();
         surfaceHolder.addCallback(new SurfaceHolder.Callback() {
             @Override
@@ -82,7 +85,7 @@ public class Playground extends SurfaceView {
                         paint.setColor(0xffff0000);
                         break;
                 }
-                c.drawOval(new RectF(one.getX() * WIDTH +offset, one.getY() * WIDTH, (one.getX() + 1) * WIDTH+offset, (one.getY() + 1) * WIDTH), paint);
+                c.drawOval(new RectF(one.getX() * WIDTH + offset, one.getY() * WIDTH, (one.getX() + 1) * WIDTH + offset, (one.getY() + 1) * WIDTH), paint);
             }
         }
         getHolder().unlockCanvasAndPost(c);
@@ -113,5 +116,33 @@ public class Playground extends SurfaceView {
 
     private Dot getDot(int x, int y) {
         return matrix[y][x];
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+
+//            Toast.makeText(getContext(), "X=" + event.getX() + "Y=" + event.getY(),Toast.LENGTH_SHORT).show();
+            int x, y;
+            y = (int) (event.getY() / WIDTH);
+            if (y % 2 == 0) {
+                //偶数行
+                x = (int) (event.getX() / WIDTH);
+
+            } else {
+                //计数行
+                x = (int) ((event.getX() - WIDTH / 2) / WIDTH);
+
+            }
+            if (x + 1 > COL || y + 1 > ROW) {
+                initGame();
+            } else {
+
+                getDot(x, y).setStatus(Dot.STATUS_ON);
+            }
+            redraw();
+        }
+        return true;
     }
 }
