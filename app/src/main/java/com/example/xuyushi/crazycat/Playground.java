@@ -1,6 +1,8 @@
 package com.example.xuyushi.crazycat;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,16 +12,22 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.Toast;
+
+import java.util.HashMap;
+import java.util.Vector;
 
 /**
  * Created by xuyushi on 15/2/21.
  */
 public class Playground extends SurfaceView implements View.OnTouchListener {
     //    public int k = 1;
+    public int step;//总共走的步数
+    boolean justInit;
     public static int WIDTH = 100;
     public static final int ROW = 10;
     public static final int COL = 10;
-    public static final int BLOCKS = 10;//障碍物个数
+    public static final int BLOCKS = 20;//障碍物个数
     private Dot matrix[][];
     private Dot cat;
     SurfaceHolder surfaceHolder;
@@ -93,6 +101,8 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
     }
 
     private void initGame() {
+        step = 0;
+        justInit = true;
         for (int i = 0; i < ROW; i++) {
             for (int j = 0; j < COL; j++) {
                 matrix[i][j].setStatus(Dot.STATUS_OFF);
@@ -113,6 +123,7 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
 
         cat = new Dot(4, 5);
         getDot(4, 5).setStatus(Dot.STATUS_IN);
+       // redraw();
     }
 
     private Dot getDot(int x, int y) {
@@ -168,6 +179,9 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
     private int getDistance(Dot dot, int dir) {
 
         int distance = 0;
+        if (isAtEdge(dot)) {
+            return 1;
+        }
         Dot ori = dot;
         Dot next;
         while (true) {
@@ -182,6 +196,12 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
             distance++;
             ori = next;
         }
+    }
+
+    private void moveTo(Dot dot) {
+        dot.setStatus(Dot.STATUS_IN);
+        getDot(cat.getX(), cat.getY()).setStatus(Dot.STATUS_OFF);
+        cat.setXY(dot.getX(), dot.getY());
     }
 
     @Override
@@ -212,10 +232,107 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
 //                k++;
             } else {
 
-                getDot(x, y).setStatus(Dot.STATUS_ON);
+
+                if (getDot(x, y).getStatus() == Dot.STATUS_OFF) {
+                    getDot(x, y).setStatus(Dot.STATUS_ON);
+                    move();
+                    step++;
+                }
             }
             redraw();
         }
         return true;
+    }
+
+    private void move() {
+        if (isAtEdge(cat)) {
+            gameLose();
+            return;
+        }
+        Vector<Dot> avaliable = new Vector<Dot>();
+        Vector<Dot> postive = new Vector<Dot>();
+        HashMap<Dot, Integer> pl = new HashMap<Dot, Integer>();
+        for (int i = 1; i < 7; i++) {
+            Dot n = getNeighbour(cat, i);
+            if (n.getStatus() == Dot.STATUS_OFF) {
+
+                avaliable.add(n);
+                pl.put(n, i);
+                if (getDistance(n, i) > 0) {
+                    postive.add(n);
+                }
+            }
+        }
+        if (avaliable.size() == 0) {
+            gameWin();
+        } else if (avaliable.size() == 1) {
+            moveTo(avaliable.get(0));
+        } else {
+            Dot best = null;
+            if (postive.size() != 0) {
+                //存在可以直接到达边缘的路径
+                int min = 999;
+                for (int i = 0; i < postive.size(); i++) {
+                    int temp = getDistance(postive.get(i), pl.get(postive.get(i)));
+                    if (temp < min) {
+                        min = temp;
+                        best = postive.get(i);
+                    }
+                }
+            } else {
+                //没有直接到达边缘的路径
+                int max = 0;
+                for (int i = 0; i < avaliable.size(); i++) {
+                    int temp = getDistance(avaliable.get(i), pl.get(avaliable.get(i)));
+                    if (temp < max) {
+                        max = temp;
+                        best = avaliable.get(i);
+                    }
+                }
+            }
+            moveTo(best);
+        }
+    }
+
+    private void gameLose() {
+        Toast.makeText(getContext(), "you lose", Toast.LENGTH_SHORT).show();
+        Log.d("CrazyCat", "step:" + step);
+
+
+        AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(getContext());
+        dialogbuilder.setTitle("LOSE");
+        dialogbuilder.setMessage("COME on \n再来一次");
+        dialogbuilder.setCancelable(false);
+        dialogbuilder.setPositiveButton("TRY AGAIN", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                initGame();
+                redraw();
+            }
+        });
+        AlertDialog alertDialog = dialogbuilder.create();
+        alertDialog.show();
+
+    }
+
+    private void gameWin() {
+        Toast.makeText(getContext(), "you win", Toast.LENGTH_SHORT).show();
+        Log.d("CrazyCat", "step:" + step);
+
+        int percent = 100 - step;
+        Toast.makeText(getContext(), "you lose", Toast.LENGTH_SHORT).show();
+        AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(getContext());
+        dialogbuilder.setTitle("WIN");
+        dialogbuilder.setMessage("YOU HAVE DEFEAT " + percent + "%people in the world");
+        dialogbuilder.setCancelable(false);
+        dialogbuilder.setPositiveButton("TRY AGAIN", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                initGame();
+                redraw();
+            }
+        });
+        AlertDialog alertDialog = dialogbuilder.create();
+        alertDialog.show();
     }
 }
