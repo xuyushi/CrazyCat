@@ -7,13 +7,14 @@ public class Dot {
     public int x,y;
     public int status;
 
-    public static int STATUS_ON = 0;
-    public static int STATUS_OFF = 1;
-    public static int STATUS_IN = 9;
+    public static final int STATUS_ON = 0;
+    public static final int STATUS_OFF = 1;
+    public static final int STATUS_IN = 9;
 
     public Dot(int x, int y) {
         this.x = x;
         this.y = y;
+        this.status = STATUS_OFF;
     }
 
     public int getX() {
@@ -30,6 +31,14 @@ public class Dot {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public void setXY(int x,int y) {
