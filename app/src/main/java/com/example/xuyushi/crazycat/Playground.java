@@ -15,6 +15,7 @@ import android.view.View;
  * Created by xuyushi on 15/2/21.
  */
 public class Playground extends SurfaceView implements View.OnTouchListener {
+    //    public int k = 1;
     public static int WIDTH = 100;
     public static final int ROW = 10;
     public static final int COL = 10;
@@ -118,6 +119,71 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
         return matrix[y][x];
     }
 
+    private boolean isAtEdge(Dot dot) {
+
+        if (dot.getX() * dot.getY() == 0 || dot.getX() + 1 == COL || dot.getY() + 1 == ROW) {
+            return true;
+        }
+        return false;
+    }
+
+    private Dot getNeighbour(Dot dot, int dir) {
+
+        switch (dir) {
+            case 1:
+                return getDot(dot.getX() - 1, dot.getY());
+            case 2:
+                if (dot.getY() % 2 == 0) {
+                    //偶数行 注意 行数从0到row-1
+                    return getDot(dot.getX() - 1, dot.getY() - 1);
+                } else {
+                    //基数行
+                    return getDot(dot.getX(), dot.getY() - 1);
+                }
+            case 3:
+                if (dot.getY() % 2 == 0) {
+                    return getDot(dot.getX(), dot.getY() - 1);
+                } else {
+                    return getDot(dot.getX() + 1, dot.getY() - 1);
+                }
+            case 4:
+                return getDot(dot.getX() + 1, dot.getY());
+            case 5:
+                if (dot.getY() % 2 == 0) {
+                    return getDot(dot.getX(), dot.getY() + 1);
+                } else {
+                    return getDot(dot.getX() + 1, dot.getY() + 1);
+                }
+            case 6:
+                if (dot.getY() % 2 == 0) {
+                    return getDot(dot.getX() - 1, dot.getY() + 1);
+                } else {
+                    return getDot(dot.getX(), dot.getY() + 1);
+                }
+            default:
+                return null;
+        }
+    }
+
+    private int getDistance(Dot dot, int dir) {
+
+        int distance = 0;
+        Dot ori = dot;
+        Dot next;
+        while (true) {
+            next = getNeighbour(ori, dir);
+            if (next.getStatus() == Dot.STATUS_ON) {
+                return distance * (-1);
+            }
+            if (isAtEdge(next)) {
+                distance++;
+                return distance;
+            }
+            distance++;
+            ori = next;
+        }
+    }
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
 
@@ -137,6 +203,13 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
             }
             if (x + 1 > COL || y + 1 > ROW) {
                 initGame();
+//                for (int i = 1; i < 7; i++) {
+//                    Log.d("CrazyCat", i + ":" + getDistance(cat, i) + "\n");
+//                }
+
+//                getNeighbour(cat, k).setStatus(Dot.STATUS_IN);
+//                redraw();
+//                k++;
             } else {
 
                 getDot(x, y).setStatus(Dot.STATUS_ON);
