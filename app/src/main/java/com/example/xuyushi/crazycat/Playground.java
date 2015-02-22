@@ -27,7 +27,7 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
     public static int WIDTH = 100;
     public static final int ROW = 10;
     public static final int COL = 10;
-    public static final int BLOCKS = 20;//障碍物个数
+    public  int BLOCKS = 10;//障碍物个数
     private Dot matrix[][];
     private Dot cat;
     SurfaceHolder surfaceHolder;
@@ -100,7 +100,7 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
         getHolder().unlockCanvasAndPost(c);
     }
 
-    private void initGame() {
+    public void initGame() {
         step = 0;
         justInit = true;
         for (int i = 0; i < ROW; i++) {

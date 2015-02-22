@@ -4,5 +4,8 @@
     <string name="app_name">CrazyCat</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="share">Share in WeiChat</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="choos_degree">Please choose the degree of difficulty</string>
 
 </resources>
