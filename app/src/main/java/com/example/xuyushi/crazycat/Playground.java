@@ -284,6 +284,7 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
                 int max = 0;
                 for (int i = 0; i < avaliable.size(); i++) {
                     int temp = getDistance(avaliable.get(i), pl.get(avaliable.get(i)));
+                    best = avaliable.get(i);
                     if (temp < max) {
                         max = temp;
                         best = avaliable.get(i);
@@ -320,7 +321,6 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
         Log.d("CrazyCat", "step:" + step);
 
         int percent = 100 - step;
-        Toast.makeText(getContext(), "you lose", Toast.LENGTH_SHORT).show();
         AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(getContext());
         dialogbuilder.setTitle("WIN");
         dialogbuilder.setMessage("YOU HAVE DEFEAT " + percent + "%people in the world");
